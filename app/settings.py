@@ -18,7 +18,7 @@ KEY_ENV = {"anthropic": "ANTHROPIC_API_KEY", "openai": "OPENAI_API_KEY", "perple
 
 
 API_KEY_NAMES = ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY", "PERPLEXITY_API_KEY")
-_FROM_SHELL: set[str] | None = None  # keys the shell set before .env was read; .env never overrides them
+KEY_SOURCE: dict[str, str] = {}  # where each API key came from: ".env" or "shell"
 
 
 def _read_dotenv(path: Path) -> dict[str, str]:
@@ -32,29 +32,35 @@ def _read_dotenv(path: Path) -> dict[str, str]:
     return out
 
 
+def _apply_keys(values: dict[str, str]) -> None:
+    """API keys in the project's .env win over keys exported in the shell. A key exported for
+    another tool (in ~/.zshrc, say) would otherwise shadow the one written for this app."""
+    for key in API_KEY_NAMES:
+        if values.get(key):
+            os.environ[key] = values[key]
+            KEY_SOURCE[key] = ".env"
+        elif os.environ.get(key):
+            KEY_SOURCE[key] = "shell"
+        else:
+            KEY_SOURCE.pop(key, None)
+
+
 def load_dotenv(path: Path = ROOT / ".env") -> None:
-    global _FROM_SHELL
-    if _FROM_SHELL is None:
-        _FROM_SHELL = {k for k in API_KEY_NAMES if os.environ.get(k)}
     if os.environ.get("JAI_NO_DOTENV") or not path.exists():  # tests set JAI_NO_DOTENV so a local .env cannot leak in
         return
-    for key, value in _read_dotenv(path).items():
-        os.environ.setdefault(key, value)
+    values = _read_dotenv(path)
+    for key, value in values.items():
+        if key not in API_KEY_NAMES:
+            os.environ.setdefault(key, value)
+    _apply_keys(values)
 
 
 def reload_api_keys(path: Path = ROOT / ".env") -> None:
     """Re-read the API keys from .env, so a key added or replaced while the app runs is used
-    the next time models are picked, without a restart. Keys set in the shell still win."""
+    the next time models are picked, without a restart."""
     if os.environ.get("JAI_NO_DOTENV") or not path.exists():
         return
-    values = _read_dotenv(path)
-    for key in API_KEY_NAMES:
-        if key in (_FROM_SHELL or set()):
-            continue
-        if values.get(key):
-            os.environ[key] = values[key]
-        else:
-            os.environ.pop(key, None)
+    _apply_keys(_read_dotenv(path))
 
 
 def _env(name: str, default: str = "") -> str:

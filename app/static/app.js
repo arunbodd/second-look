@@ -237,7 +237,7 @@
       else { jSel.querySelector('option[value="recorded"]')?.remove(); if (!jSel.value) jSel.value = "offline"; }
       jSel.disabled = rec;
       if (rec) { note.append(el("div", {}, `A run recorded on ${mm.recorded.recorded_at.slice(0, 10)}: ${mm.recorded.writer} wrote every assessment and ${mm.recorded.judge} judged it; the suspicious cases also have answers to the starter questions. Nothing is sent to a model. A case whose evidence has changed since the recording shows "not run".`)); return; }
-      note.append(el("div", {}, ...Object.entries(mm.keys).map(([f, ok]) => el("span", { style: "margin-right:12px" }, el("i", { class: "key" + (ok ? " on" : "") }), `${mm.catalog.find((e) => e.family === f)?.family_label || f} key ${ok ? "set" : "not set"}`))));
+      note.append(el("div", {}, ...Object.entries(mm.keys).map(([f, ok]) => el("span", { style: "margin-right:12px" }, el("i", { class: "key" + (ok ? " on" : "") }), `${mm.catalog.find((e) => e.family === f)?.family_label || f} key ${ok ? "set" + (mm.key_source?.[f] ? ` (from ${mm.key_source[f] === "shell" ? "your shell" : ".env"})` : "") : "not set"}`))));
       if (wSel.value !== "offline" && famOf(wSel.value) && famOf(wSel.value) === famOf(jSel.value)) note.append(el("div", { class: "warn" }, "Writer and judge come from the same model maker. A model tends to rate its own output favourably; a judge from another family is a more independent review."));
       else if (wSel.value !== "offline" && jSel.value === "offline") note.append(el("div", {}, "Without a judge, drafts get the rule checks only."));
       else note.append(el("div", {}, "Keys are read from .env (OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, or PERPLEXITY_API_KEY, which reaches all three makers). Prices are $ per million tokens in / out."));
@@ -902,7 +902,12 @@
       el("div", { class: "sec-head" }, el("span", { class: "label" }, `Signals · ${fired} of ${c.signals.length} flagged`),
         el("div", { class: "sig-legend" }, el("span", {}, el("i", { class: "sw", style: "background:var(--accent)" }), "strong"), el("span", {}, el("i", { class: "sw", style: "background:var(--ochre)" }), "moderate"), el("span", {}, el("i", { class: "sw", style: "background:var(--rule)" }), "clear"))),
       el("div", { class: "sig-grid" }, c.signals.map((s) => el("div", { class: `sig-cell ${s.level}`, "data-tip": `${s.text}\n${s.meaning}` + (s.percentile != null ? `\n${ordinal(s.percentile)} percentile of the queue.` : "") }, el("div", { class: "k" }, SIGNAL_LABEL[s.key] || s.label), el("div", { class: "v" }, s.level === "missing" ? "n/a" : s.display)))),
-      el("div", { class: "chips" }, c.families.map((fm) => el("span", { class: "chip" + (fm.level === "elevated" || fm.level === "high" ? "" : " off"), "data-tip": fm.label }, fm.level === "missing" ? `${fm.short} n/a` : fm.level === "normal" ? `${fm.short} clear` : `${fm.short} −${Math.round(fm.drop_if_explained)}`)), el("span", { class: "faint" }, "points if the family were explained")));
+      el("div", { class: "chips" }, c.families.map((fm) => {
+        const after = Math.round(c.risk_score - fm.drop_if_explained);
+        return el("span", { class: "chip" + (fm.level === "elevated" || fm.level === "high" ? "" : " off"),
+          "data-tip": fm.level === "elevated" || fm.level === "high" ? `${fm.label}: if this family alone had an innocent explanation, the score would fall from ${c.risk_score} to ${after}. The other families stay as they are, so the drops do not add up.` : fm.label },
+          fm.level === "missing" ? `${fm.short} n/a` : fm.level === "normal" ? `${fm.short} clear` : `${fm.short} ${c.risk_score} → ${after}`);
+      }), el("span", { class: "faint" }, "score if only that family were explained")));
     body.append(sg);
 
     /* collapsed rows */

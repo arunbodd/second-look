@@ -378,21 +378,19 @@ def test_network_guard_blocks_rebinding_and_cross_site_writes(client):
 
 
 def test_api_keys_edited_in_dotenv_apply_without_restart(tmp_path, monkeypatch):
+    import os
+
     from app import settings as st
 
     env = tmp_path / ".env"
-    env.write_text("PERPLEXITY_API_KEY=old\n")
     monkeypatch.delenv("JAI_NO_DOTENV", raising=False)
-    monkeypatch.delenv("PERPLEXITY_API_KEY", raising=False)
-    monkeypatch.setattr(st, "_FROM_SHELL", set())
+    monkeypatch.setenv("PERPLEXITY_API_KEY", "stale-key-from-the-shell")
+    env.write_text("PERPLEXITY_API_KEY=old\n")
     st.reload_api_keys(env)
-    import os
-    assert os.environ["PERPLEXITY_API_KEY"] == "old"
+    assert os.environ["PERPLEXITY_API_KEY"] == "old" and st.KEY_SOURCE["PERPLEXITY_API_KEY"] == ".env"  # .env wins
     env.write_text("PERPLEXITY_API_KEY=new\n")
     st.reload_api_keys(env)
-    assert os.environ["PERPLEXITY_API_KEY"] == "new"
-    monkeypatch.setattr(st, "_FROM_SHELL", {"PERPLEXITY_API_KEY"})  # a key exported in the shell wins
-    env.write_text("PERPLEXITY_API_KEY=other\n")
+    assert os.environ["PERPLEXITY_API_KEY"] == "new"  # an edit applies without a restart
+    env.write_text("PERPLEXITY_API_KEY=\n")
     st.reload_api_keys(env)
-    assert os.environ["PERPLEXITY_API_KEY"] == "new"
-    monkeypatch.delenv("PERPLEXITY_API_KEY", raising=False)
+    assert st.KEY_SOURCE["PERPLEXITY_API_KEY"] == "shell"  # an empty .env entry leaves the shell's key in place

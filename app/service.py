@@ -24,7 +24,7 @@ from .llm.providers import LLMError, LLMProvider, build_provider
 from .quality.checks import run_rule_checks
 from .recorded import RecordedRun
 from .quality.judge import combine, judge_assessment
-from .settings import Settings, reload_api_keys
+from .settings import KEY_SOURCE, Settings, reload_api_keys
 from .store import Store, now_iso
 from . import workflow as wf
 
@@ -91,6 +91,7 @@ class TriageService:
         return {
             "catalog": entries,
             "keys": keys,
+            "key_source": {fam: KEY_SOURCE.get(spec["key_env"]) for fam, spec in catalog.FAMILIES.items()},
             "current": ({"writer": "recorded", "judge": "recorded"} if self.replay
                         else {"writer": catalog.entry_id_for(writer), "judge": catalog.entry_id_for(judge)}),
             "same_family": writer.enabled and judge.enabled and _family(writer) == _family(judge),
