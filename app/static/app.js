@@ -768,7 +768,7 @@
     const summary = el("p", { class: "cl-sum" },
       `Fig. 5 shows what the data does: every pair of signals moves together here (r ${fix(lo)} to ${fix(hi)}). This figure shows which of those pairs have a business reason to. `,
       el("b", {}, `${count("together", true)} of ${total("together")}`), " pairs that should rise together do. ",
-      el("b", {}, `${off} of ${total("support") + total("independent")}`), " pairs with a weak or no business link move together just as strongly, which points to one hidden driver behind every column in this synthetic file. ",
+      el("b", {}, `${off} of ${total("support") + total("independent")}`), " pairs with a weak or no business link move together just as strongly, which points to one common pattern behind every column in this synthetic file. ",
       el("b", {}, `${total("tension") - count("tension", true)} of ${total("tension")}`), " pairs that should cut against each other in legitimate claims also rise together, so here a suspicious case tends to carry the contradictory combination. Both figures are right: Fig. 5 is the observation, this one is the expectation it is checked against.");
     const body = el("tbody", {});
     for (const [rel, label] of groups) {
@@ -841,7 +841,7 @@
     push(el("span", { "data-tip": c.anomaly.text }, `outlier ${ordinal(c.anomaly.percentile)} pct ${c.anomaly.agrees ? "✓" : "✗"}`));
     push(el("span", { "data-tip": "Claim amount × risk score" }, `${money(c.dollars_at_risk)} at risk`));
     for (const l of c.linked) push("linked to ", el("a", { href: "#", onclick: (e) => { e.preventDefault(); openCase(l.case_id); } }, l.case_id));
-    if (c.base_lane !== c.lane) push(el("span", { "data-tip": "A safety rule raised this case above the rating its score alone gives" }, "raised by rule"));
+    if (c.base_lane !== c.lane) push(el("span", { "data-tip": "A review rule raised this case above the rating its score alone gives" }, "raised by rule"));
     const head = el("div", { class: "d-head" },
       el("div", { class: "d-top" }, eyebrow(`${f.case_id} · ${LANE_LABEL[c.lane]} · ${f.care_type} · ${f.state} · ${f.claim_date} · claim ${f.claim_number} · ${money(f.claim_amount_usd)}`),
         el("div", { class: "d-nav" },
@@ -905,9 +905,9 @@
       el("div", { class: "chips" }, c.families.map((fm) => {
         const after = Math.round(c.risk_score - fm.drop_if_explained);
         return el("span", { class: "chip" + (fm.level === "elevated" || fm.level === "high" ? "" : " off"),
-          "data-tip": fm.level === "elevated" || fm.level === "high" ? `${fm.label}: if this family alone had an innocent explanation, the score would fall from ${c.risk_score} to ${after}. The other families stay as they are, so the drops do not add up.` : fm.label },
+          "data-tip": fm.level === "elevated" || fm.level === "high" ? `${fm.label}: if a legitimate explanation ruled out this family alone, the score would fall from ${c.risk_score} to ${after}. The other families stay as they are, so the drops do not add up.` : fm.label },
           fm.level === "missing" ? `${fm.short} n/a` : fm.level === "normal" ? `${fm.short} clear` : `${fm.short} ${c.risk_score} → ${after}`);
-      }), el("span", { class: "faint" }, "score if only that family were explained")));
+      }), el("span", { class: "faint" }, "score if only that family were ruled out")));
     body.append(sg);
 
     /* collapsed rows */

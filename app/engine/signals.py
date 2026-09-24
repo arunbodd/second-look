@@ -190,7 +190,7 @@ SIGNALS: list[Signal] = [
         # A resident is billed every day, often for more than one unit (nursing, therapy, aide care):
         # up to two billed units a day is normal, four or more a day is strongly unusual.
         overrides={"Assisted Living": (14, 28), "Skilled Nursing": (14, 28)},
-        triggered_text="{v} visits per week were billed; the expected ceiling is {normal}.",
+        triggered_text="{v} visits per week were billed; the normal limit is {normal}.",
         normal_text="{v} visits per week is within the expected range (up to {normal}).",
         meaning="Billed visits per week. Fourteen or more means at least two visits every day of the week.",
     ),
@@ -205,7 +205,7 @@ SIGNALS: list[Signal] = [
         high_at=150,
         # A resident lives at the facility, so distance says nothing about whether care was delivered.
         unscored_care=("Assisted Living", "Skilled Nursing"),
-        triggered_text="The provider is {v} from the member; the expected ceiling is {normal} miles.",
+        triggered_text="The provider is {v} from the member; the normal limit is {normal} miles.",
         normal_text="The provider is {v} from the member, within the expected {normal} miles.",
         meaning="Distance between the member's address of record and the provider. Long distances make frequent visits implausible.",
     ),
@@ -219,9 +219,9 @@ SIGNALS: list[Signal] = [
         normal_max=0.29,
         high_at=0.60,
         overrides={"Adult Day Care": (0.10, 0.45)},
-        triggered_text="{v} of billed services fall on weekends; the expected ceiling for {care_type} is {normal}.",
+        triggered_text="{v} of billed services fall on weekends; the normal limit for {care_type} is {normal}.",
         normal_text="{v} of billed services fall on weekends, within the expected {normal} for {care_type}.",
-        meaning="Share of billed services dated on a Saturday or Sunday. Two of seven days is about 29%, so higher shares are unusual. Adult day care centers mostly operate on weekdays, so the ceiling is lower for that care type.",
+        meaning="Share of billed services dated on a Saturday or Sunday. Two of seven days is about 29%, so higher shares are unusual. Adult day care centers mostly operate on weekdays, so the normal limit is lower for that care type.",
     ),
     Signal(
         key="shared_contact_with_provider",
@@ -242,7 +242,7 @@ SIGNALS: list[Signal] = [
         unit="%",
         normal_max=20,
         high_at=100,
-        triggered_text="The billed amount is {v} above the peer average; the expected ceiling is {normal}.",
+        triggered_text="The billed amount is {v} above the peer average; the normal limit is {normal}.",
         normal_text="The billed amount is {v} relative to the peer average, within the expected {normal}.",
         meaning="How far the claim amount sits above or below the average for comparable claims, as computed upstream.",
     ),
@@ -255,7 +255,7 @@ SIGNALS: list[Signal] = [
         unit="share",
         normal_max=0.25,
         high_at=0.75,
-        triggered_text="{v} of line items are round-dollar amounts; the expected ceiling is {normal}.",
+        triggered_text="{v} of line items are round-dollar amounts; the normal limit is {normal}.",
         normal_text="{v} of line items are round-dollar amounts, within the expected {normal}.",
         meaning="Share of line items billed in whole round amounts. Amounts derived from real timesheets are rarely round, so a high share can indicate estimated or fabricated records.",
     ),
@@ -280,7 +280,7 @@ SIGNALS: list[Signal] = [
         high_at=10,
         # Residential care is usually billed monthly, so about 12 claims a year is normal.
         overrides={"Assisted Living": (12, 24), "Skilled Nursing": (12, 24)},
-        triggered_text="{v} prior claims in the last 12 months; the expected ceiling is {normal}.",
+        triggered_text="{v} prior claims in the last 12 months; the normal limit is {normal}.",
         normal_text="{v} prior claims in the last 12 months, within the expected {normal}.",
         meaning="Number of claims filed by this member in the previous 12 months.",
     ),

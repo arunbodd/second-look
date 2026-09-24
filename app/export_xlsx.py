@@ -71,7 +71,7 @@ def build_workbook(svc, mode: str) -> bytes:
     order = sorted(rows, key=lambda r: (priority.get(r["case_id"], 10_000), -r["risk_score"], r["case_id"]))
     heads = ["Priority", "Case ID", "Claim number", "Claim date", "Care type", "State", "Claim amount ($)",
              "Risk score", "Risk rating", "Confidence", "Dollars at risk ($)", "Why (top drivers)", "Decision", "Status",
-             "Final risk rating", "AI review", "Linked cases", "Safety rules"]
+             "Final risk rating", "AI review", "Linked cases", "Review rules"]
     _header(q, 1, heads)
     for i, r in enumerate(order, start=2):
         vals = [priority.get(r["case_id"]), r["case_id"], r["claim_number"], r["claim_date"], r["care_type"], r["state"],

@@ -168,7 +168,7 @@ def offline_narrative(case: dict) -> dict:
             steps = [
                 f"Confirm with claims operations whether claim number {f['claim_number']} was keyed in error on one of the two cases.",
                 f"If both cases are genuine, check whether the same member or provider is behind {f['case_id']} and {other['case_id']}.",
-                "Close this case as a false positive only after the link is explained.",
+                "Close this case as a false positive only after the link is resolved.",
             ]
         elif "anomaly_disagrees" in codes:
             summary = (
@@ -370,11 +370,11 @@ def _answer_why(case: dict, p: dict, lane_label: str) -> str:
             f"The case is rated {lane_label} with a risk score of {case['risk_score']} out of 100 because none of the "
             "five evidence families is active. The upstream duplicate [E1], overlap [E2], and shared-contact [E6] "
             "flags are not set, and visit frequency [E3] is normal."
-            + (" It is held for review only because of a safety rule: " + case["guardrails"][0]["text"]
+            + (" It is held for review only because of a review rule: " + case["guardrails"][0]["text"]
                if case["lane"] != case["base_lane"] else "")
         )
     lines = [f"The risk score is {case['risk_score']} out of 100 ({lane_label}). Each active evidence family "
-             "and how much the score would drop if it were explained:"]
+             "and how much the score would drop if it were ruled out:"]
     for fam in p["active"]:
         top = _strongest_in(fam, case)
         lines.append(f"- **{fam['short']}**: {phrase(top)} [{top['evidence_id']}]; explaining it would lower the "
@@ -439,7 +439,7 @@ def _answer_counterfactual(case: dict, p: dict) -> str:
     for step in cf["lower"]:
         cites = "".join(fam_ids.get(k, "") for k in step["family_keys"])
         lines.append(
-            f"- If {oxford([x.lower() for x in step['families']])} were explained {cites}, the score would fall to "
+            f"- If {oxford([x.lower() for x in step['families']])} were ruled out {cites}, the score would fall to "
             f"{step['risk_after']} ({LANES[step['lane_after']]['label'].lower()})."
         )
     for r in cf["raise"]:

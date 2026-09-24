@@ -259,7 +259,7 @@ def run_rule_checks(narr: dict, case: dict, pack: dict) -> dict:
         link_ids = {e["id"] for e in pack["evidence"] if e["kind"] == "link"}
         if not (link_ids & cited):
             issues.append(_issue("completeness", "high",
-                                 "Ignores the safety rule: this case shares a claim number with a suspicious case.",
+                                 "Ignores the review rule: this case shares a claim number with a suspicious case.",
                                  "Cite the linked case and explain that the link must be resolved before closing.", sorted(link_ids)))
     if case.get("qa_sample") and not _contains_any(["quality", "full review", "qa sample"], full):
         issues.append(_issue("completeness", "medium", "Does not mention that this case is a quality-assurance sample.",

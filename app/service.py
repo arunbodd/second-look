@@ -729,7 +729,7 @@ class TriageService:
                 lines.append(f"  - Counter-argument: {c}")
         lines.append("")
         if case["guardrails"]:
-            lines += ["## Safety rules applied", ""] + [f"- {g['text']}" for g in case["guardrails"]] + [""]
+            lines += ["## Review rules applied", ""] + [f"- {g['text']}" for g in case["guardrails"]] + [""]
         if state["decisions"]:
             lines += ["## Decisions and status changes", ""] + [f"- {d['ts']} {d['actor']}: {d['summary']}" for d in state["decisions"]] + [""]
         if case["data_gaps"]:

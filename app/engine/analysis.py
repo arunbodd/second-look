@@ -57,7 +57,7 @@ def _cutoff(sig) -> str:
     if sig.kind == "binary":
         return "Flag set to 1"
     lo, hi = sig.thresholds("")
-    text = f"Above {fmt_value(sig, lo)}; full weight at {fmt_value(sig, hi)}"
+    text = f"Above {fmt_value(sig, lo)}; strongly unusual at {fmt_value(sig, hi)}"
     groups: dict[tuple, list[str]] = {}
     for care, th in sig.overrides.items():
         groups.setdefault(tuple(th), []).append(care)

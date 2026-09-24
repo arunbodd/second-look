@@ -45,7 +45,7 @@ def _each(care_types: set[str], extra: str, counters: tuple[str, ...] = ()) -> d
 SIGNAL_RATIONALE: dict[str, Rationale] = {
     "duplicate_service_billed": Rationale(
         points_to="If confirmed, double billing by this provider: the insurer would pay twice for one unit of care. "
-        "Until the service lines are pulled it is a lead to verify.",
+        "Until the service lines are pulled it is an unverified flag to check.",
         assumption="The flag counts as a duplicate only if the upstream engine matched the same member, provider, "
         "service, and date of service. Similar services for different members, or the same service on different "
         "days, are normal billing and would make the flag a false positive. The file does not show which rule the "
@@ -60,7 +60,7 @@ SIGNAL_RATIONALE: dict[str, Rationale] = {
     ),
     "service_overlap_other_provider": Rationale(
         points_to="If confirmed, the same care billed by two providers, or care billed by one of them without being "
-        "delivered. Until the other claim is pulled it is a lead to verify.",
+        "delivered. Until the other claim is pulled it is an unverified flag to check.",
         assumption="The flag is read as a different provider billing this same member for dates that overlap this "
         "claim. The other claim is outside this file, and the file has no member or provider identifiers, so "
         "nothing in the 50 cases shows which claim overlaps.",

@@ -64,10 +64,10 @@ def build_evidence(case: dict) -> list[dict]:
             "text": s["text"],
             "definition": s["meaning"],
             "source": (
-                "Yes/no flag from the upstream fraud engine. The file does not show what it matched, so it is a lead "
+                "Yes/no flag from the upstream fraud engine. The file does not show what it matched, so it is an unverified flag "
                 "to verify."
                 if s["kind"] == "binary"
-                else "Value computed by the upstream fraud engine; the expected ceiling is this prototype's assumption."
+                else "Value computed by the upstream fraud engine; the normal limit is this prototype's assumption."
             ),
             **_reasoning(SIGNAL_RATIONALE[s["key"]], care, context),
         }
@@ -158,7 +158,7 @@ def evidence_pack(case: dict) -> dict:
     lines = []
     for step in cf["lower"]:
         lines.append(
-            f"If {', '.join(step['families'])} were explained, the score would fall to {step['risk_after']} "
+            f"If {', '.join(step['families'])} were ruled out, the score would fall to {step['risk_after']} "
             f"({LANES[step['lane_after']]['label'].lower()})."
         )
     for r in cf["raise"]:
@@ -195,7 +195,7 @@ def evidence_pack(case: dict) -> dict:
                 for f in active
             ],
             "clean_evidence_families": [f["label"] for f in clean],
-            "safety_rules_applied": [g["text"] for g in case["guardrails"]],
+            "review_rules_applied": [g["text"] for g in case["guardrails"]],
             "what_would_change_the_assessment": lines,
             "column_logic_for_red_flag_pairs": column_logic,
         },

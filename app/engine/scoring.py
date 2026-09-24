@@ -414,7 +414,7 @@ def _build_case(
     families.sort(key=lambda f: (-f["share"], -f["drop_if_explained"]))
     active = [f for f in families if f["level"] in ("elevated", "high")]
 
-    # ---- guardrails (safety rules that can only raise a lane, never lower it) ---------
+    # ---- guardrails (review rules that send a low-scoring case to review) ---------
     high_links = [l for l in linked if l["base_lane"] == "suspicious"]
     if high_links and lane == "likely_fp":
         lane = "review"
@@ -510,7 +510,7 @@ def _build_case(
         else:
             support("The score is well clear of the risk-rating boundaries (30 and 60).")
     else:
-        downgrade("Medium", "A safety rule raised the risk rating above what the score alone gives.")
+        downgrade("Medium", "A review rule raised the risk rating above what the score alone gives.")
     if not agrees:
         downgrade("Low", "The statistical outlier check disagrees with the rules-based score.")
     else:

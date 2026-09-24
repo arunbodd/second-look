@@ -55,7 +55,7 @@ def signal_readings(case: dict) -> dict[str, str]:
             pair = (f"Both upstream flags are set: a duplicate on this claim ({e['duplicate_service_billed']}) and an "
                     f"overlapping claim from another provider ({e['service_overlap_other_provider']}). If both are "
                     "confirmed, this provider billed some care more than once and a second provider billed the same "
-                    "dates. Neither flag can be checked in this file, so both are leads: this claim's service lines and "
+                    "dates. Neither flag can be checked in this file, so both are unverified flags: this claim's service lines and "
                     "the other provider's claim come first.")
         elif d >= 1:
             pair = (f"Only the duplicate flag is set; no overlapping claim from another provider was flagged "
@@ -248,7 +248,7 @@ def profile_reading(case: dict) -> str:
     care = case["facts"]["care_type"]
     if care in DAY_CENTER:
         return ("As adult day care: the member travels to the center, visits count attendance days (5 weekdays a week), "
-                "the weekend ceiling is 10%, and round amounts carry less weight because of flat daily rates.")
+                "the weekend limit is 10%, and round amounts carry less weight because of flat daily rates.")
     if care in RESIDENTIAL:
         return (f"As {care.lower()}: the member lives at the facility, so distance should be near zero, visits count "
                 "billed units, care is billed every day, and round amounts carry less weight because of flat daily rates.")
