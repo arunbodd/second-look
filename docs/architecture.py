@@ -1,7 +1,8 @@
 """Generate docs/architecture.svg (and, with --png, docs/architecture.png via Playwright).
 
-One figure, one claim: the engine owns every number, models only write words through a
-two-layer quality gate, and people make every decision into an append-only log.
+One figure showing how a referral moves through the app: the case sheet is scored by the
+rules engine, an optional model drafts the text, automated checks and a judge review it, and the
+investigator's actions are written to an append-only log.
 """
 
 from __future__ import annotations
@@ -68,7 +69,7 @@ def build() -> str:
 
     # ---- header
     t(40, 44, "ARCHITECTURE · SECOND LOOK 1.2", size=12, fam=MONO, fill=FAINT, ls="0.06em")
-    t(40, 84, "The engine owns every number. Models only write words, through a quality gate. People decide.", size=28, fam=SERIF, weight=500)
+    t(40, 84, "How a referral moves through Second Look", size=28, fam=SERIF, weight=500)
     out.append(f'<line x1="40" y1="104" x2="{W - 40}" y2="104" stroke="{INK}" stroke-width="1.5"/>')
 
     # ---- column 1: ingest
@@ -169,8 +170,8 @@ def build() -> str:
         ("API", "FastAPI · Uvicorn", "Pydantic request models"),
         ("Transport", "http 8000", "https 8443 (self-signed)"),
         ("Ship", "Docker, non-root", "/healthz · /readyz"),
-        ("Protect", "strict CSP · headers", "request IDs · input limits"),
-        ("Test", "pytest · 78 tests", "GitHub Actions CI"),
+        ("Protect", "127.0.0.1 only · strict CSP", "host and origin checks"),
+        ("Test", "pytest · 88 tests", "GitHub Actions CI"),
         ("Export", "Excel via openpyxl", "Markdown case file"),
     ]
     cw6 = (W - 80) / len(cells)
@@ -182,7 +183,7 @@ def build() -> str:
         t(x + pad, 796, a_, size=14, weight=600)
         t(x + pad, 818, b_, size=12, fam=MONO, fill=MUTED)
         t(x + pad, 837, c_, size=12, fam=MONO, fill=MUTED)
-    t(40, 880, "Keys stay in .env on the server; the browser never sees them. Offline by default: with no key the rules review runs end to end.",
+    t(40, 880, "API keys stay in .env on the server and never reach the browser. With no key, the rules review and the recorded AI run still work.",
       size=12.5, fill=FAINT, italic=True)
 
     out.append("</svg>")
