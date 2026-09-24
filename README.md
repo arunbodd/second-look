@@ -2,6 +2,8 @@
 
 Second Look triages a queue of long-term care fraud referrals before an investigator opens it. Each case gets a risk score, a risk rating, a short assessment that cites its evidence, and a suggested next step. The investigator accepts or rejects each finding, moves the case through review, and can ask questions about it.
 
+**Demo video (5 minutes):** [Demo_Second_Look.mp4](https://github.com/arunbodd/second-look/releases/download/v1.0/Demo_Second_Look.mp4)
+
 ![Architecture](docs/architecture.png)
 
 A rules engine computes every score. A language model is optional: it writes the assessment and answers questions, and every draft is checked against the case's evidence before anyone sees it. Without an API key, the app shows a recorded model run for the 50 sample cases.
