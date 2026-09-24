@@ -879,12 +879,12 @@
         el("button", { class: fb === "agree" ? "a" : "", "aria-label": "Agree", "data-tip": "Agree with this indicator", onclick: () => feedback(id, fb === "agree" ? "clear" : "agree") }, "✓"),
         el("button", { class: fb === "disagree" ? "d" : "", "aria-label": "Disagree", "data-tip": "Disagree with this indicator", onclick: () => feedback(id, fb === "disagree" ? "clear" : "disagree") }, "✗")); };
       const clean = c.families.filter((fm) => fm.level === "normal").map((fm) => `No sign of ${fm.short.toLowerCase()} in this file.`);
-      const counter = [...mit.map((k) => ({ html: cites(k.statement) + ` <span class="cite">[${k.evidence_id}]</span>` })),
+      const counter = [...mit.map((k) => ({ html: cites(k.statement) + ((k.statement || "").includes(`[${k.evidence_id}]`) ? "" : ` <span class="cite">[${k.evidence_id}]</span>`) })),
         ...(n.innocent_explanations || []).slice(0, 3).map((t) => ({ text: t })), ...clean.slice(0, Math.max(0, 3 - mit.length)).map((t) => ({ text: t }))];
       why.append(el("div", { class: "why2" },
         el("div", { class: "col" }, el("div", { class: "col-h" }, "Points to risk"),
           risk.length ? el("ol", { class: "why" }, risk.map((ind) => el("li", {}, el("span", { html: cites(ind.statement) }), " ",
-            el("span", { class: "tail" }, el("span", { class: "cite" }, `[${ind.evidence_id}]`), fbButtons(ind.evidence_id))))) : el("p", { class: "why-note" }, "No signal is above its expected range.")),
+            el("span", { class: "tail" }, (ind.statement || "").includes(`[${ind.evidence_id}]`) ? null : el("span", { class: "cite" }, `[${ind.evidence_id}]`), fbButtons(ind.evidence_id))))) : el("p", { class: "why-note" }, "No signal is above its expected range.")),
         el("div", { class: "col" }, el("div", { class: "col-h" }, "Could explain it"),
           counter.length ? el("ul", { class: "why counter" }, counter.map((x) => x.html ? el("li", { html: x.html }) : el("li", {}, x.text))) : el("p", { class: "why-note" }, "Nothing in the file points the other way."))));
       const gaps = c.data_gaps || [];

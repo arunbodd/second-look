@@ -164,7 +164,7 @@ def analyse(df: pd.DataFrame, cases: dict[str, dict], order: list[str]) -> dict:
         {"column": "claim_amount_usd", "in_score": "No. Sets dollars at risk and the order within a risk rating.",
          "stat": "Spearman r", "value": _spearman(amount, risk),
          "detail": {lane: _num(amount[lanes == lane].median()) for lane in ("likely_fp", "review", "suspicious")}},
-        {"column": "care_type", "in_score": "Only to set the weekend limit for adult day care.",
+        {"column": "care_type", "in_score": "Only to set care-specific limits (weekend share for adult day care; visits, prior claims, and distance for facility care).",
          "stat": "Kruskal–Wallis p", "value": _kruskal_p([g.values for _, g in by_care]),
          "detail": {k: _num(v) for k, v in by_care.median().items()}},
         {"column": "state", "in_score": "No. Filter and display only.",
