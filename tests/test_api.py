@@ -375,3 +375,24 @@ def test_network_guard_blocks_rebinding_and_cross_site_writes(client):
     assert netguard.check("POST", "localhost:8000", "http://localhost:3000", None, hosts)  # another local app
     assert netguard.check("GET", "192.168.1.20:8000", None, None, hosts)
     assert netguard.is_loopback("127.0.0.1") and netguard.is_loopback("::1") and not netguard.is_loopback("0.0.0.0")
+
+
+def test_api_keys_edited_in_dotenv_apply_without_restart(tmp_path, monkeypatch):
+    from app import settings as st
+
+    env = tmp_path / ".env"
+    env.write_text("PERPLEXITY_API_KEY=old\n")
+    monkeypatch.delenv("JAI_NO_DOTENV", raising=False)
+    monkeypatch.delenv("PERPLEXITY_API_KEY", raising=False)
+    monkeypatch.setattr(st, "_FROM_SHELL", set())
+    st.reload_api_keys(env)
+    import os
+    assert os.environ["PERPLEXITY_API_KEY"] == "old"
+    env.write_text("PERPLEXITY_API_KEY=new\n")
+    st.reload_api_keys(env)
+    assert os.environ["PERPLEXITY_API_KEY"] == "new"
+    monkeypatch.setattr(st, "_FROM_SHELL", {"PERPLEXITY_API_KEY"})  # a key exported in the shell wins
+    env.write_text("PERPLEXITY_API_KEY=other\n")
+    st.reload_api_keys(env)
+    assert os.environ["PERPLEXITY_API_KEY"] == "new"
+    monkeypatch.delenv("PERPLEXITY_API_KEY", raising=False)

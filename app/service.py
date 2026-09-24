@@ -24,7 +24,7 @@ from .llm.providers import LLMError, LLMProvider, build_provider
 from .quality.checks import run_rule_checks
 from .recorded import RecordedRun
 from .quality.judge import combine, judge_assessment
-from .settings import Settings
+from .settings import Settings, reload_api_keys
 from .store import Store, now_iso
 from . import workflow as wf
 
@@ -80,6 +80,7 @@ class TriageService:
     # ---- models ----------------------------------------------------------------------
     def models(self) -> dict:
         """The catalogue the Models menu offers, which keys are present, and the current pair."""
+        reload_api_keys()
         entries = []
         keys = catalog.key_status()
         for e in [*catalog.CATALOG, *self._custom_models]:
@@ -135,6 +136,7 @@ class TriageService:
     def set_models(self, writer_id: str | None, judge_id: str | None) -> dict:
         """Switch the writer and/or the judge without a restart. Cached assessments for the new
         pair are restored; a review run in progress is stopped first."""
+        reload_api_keys()  # a key edited in .env since startup is picked up here
         if writer_id == "recorded":
             if not self.recorded:
                 raise ValueError("No recorded run ships with this copy (data/recorded_review.json is missing).")

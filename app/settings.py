@@ -17,16 +17,44 @@ DEFAULT_MODELS = {"anthropic": "claude-sonnet-5", "openai": "", "perplexity": "o
 KEY_ENV = {"anthropic": "ANTHROPIC_API_KEY", "openai": "OPENAI_API_KEY", "perplexity": "PERPLEXITY_API_KEY", "litellm": ""}
 
 
-def load_dotenv(path: Path = ROOT / ".env") -> None:
-    if os.environ.get("JAI_NO_DOTENV") or not path.exists():  # tests set JAI_NO_DOTENV so a local .env cannot leak in
-        return
+API_KEY_NAMES = ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY", "PERPLEXITY_API_KEY")
+_FROM_SHELL: set[str] | None = None  # keys the shell set before .env was read; .env never overrides them
+
+
+def _read_dotenv(path: Path) -> dict[str, str]:
+    out = {}
     for line in path.read_text().splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, _, value = line.partition("=")
-        key, value = key.strip(), value.strip().strip('"').strip("'")
+        out[key.strip()] = value.strip().strip('"').strip("'")
+    return out
+
+
+def load_dotenv(path: Path = ROOT / ".env") -> None:
+    global _FROM_SHELL
+    if _FROM_SHELL is None:
+        _FROM_SHELL = {k for k in API_KEY_NAMES if os.environ.get(k)}
+    if os.environ.get("JAI_NO_DOTENV") or not path.exists():  # tests set JAI_NO_DOTENV so a local .env cannot leak in
+        return
+    for key, value in _read_dotenv(path).items():
         os.environ.setdefault(key, value)
+
+
+def reload_api_keys(path: Path = ROOT / ".env") -> None:
+    """Re-read the API keys from .env, so a key added or replaced while the app runs is used
+    the next time models are picked, without a restart. Keys set in the shell still win."""
+    if os.environ.get("JAI_NO_DOTENV") or not path.exists():
+        return
+    values = _read_dotenv(path)
+    for key in API_KEY_NAMES:
+        if key in (_FROM_SHELL or set()):
+            continue
+        if values.get(key):
+            os.environ[key] = values[key]
+        else:
+            os.environ.pop(key, None)
 
 
 def _env(name: str, default: str = "") -> str:

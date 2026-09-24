@@ -188,9 +188,10 @@ def test_perplexity_agent_provider_request_and_parsing():
         return httpx.Response(200, json={"model": body["model"], "output": [
             {"type": "message", "content": [{"type": "output_text", "text": '{"ok": true}'}]}], "usage": {"input_tokens": 5}})
 
-    cfg = ProviderConfig(provider="perplexity", model="anthropic/claude-sonnet-5", api_key="pplx-test")
+    cfg = ProviderConfig(provider="perplexity", model="google/gemini-3.1-pro-preview", api_key="pplx-test")
     comp = PerplexityAgentProvider(cfg, httpx.MockTransport(handler)).complete("sys", [{"role": "user", "content": "hi"}], json_output=True)
-    assert comp.text == '{"ok": true}' and comp.model == "anthropic/claude-sonnet-5"
+    assert comp.text == '{"ok": true}' and comp.model == "google/gemini-3.1-pro-preview"
+    assert "temperature" in seen[0][2]
     url, headers, body = seen[-1]
     assert url == "https://api.perplexity.ai/v1/agent" and headers["authorization"] == "Bearer pplx-test"
     assert "tools" not in body and "temperature" not in body and body["input"] == [{"role": "user", "content": "hi"}]
@@ -259,3 +260,27 @@ def test_rate_limits_are_retried_with_backoff(monkeypatch):
     assert providers.post_with_retry(client, "https://x/y", {}).status_code == 200 and not replies
     client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(401, text="bad key")))
     assert providers.post_with_retry(client, "https://x/y", {}).status_code == 401  # never retried
+
+
+def test_perplexity_claude_gets_max_tokens_and_no_temperature():
+    """Perplexity requires max_output_tokens for Claude and rejects it together with temperature."""
+    import json as _json
+
+    import httpx
+
+    from app.llm.providers import PerplexityAgentProvider, ProviderConfig
+
+    bodies = []
+
+    def handler(request):
+        body = _json.loads(request.content)
+        bodies.append(body)
+        if "temperature" in body or "max_output_tokens" not in body:
+            return httpx.Response(400, json={"error": {"message": "invalid request"}})
+        return httpx.Response(200, json={"model": body["model"], "output_text": "ok", "usage": {}})
+
+    cfg = ProviderConfig(provider="perplexity", model="anthropic/claude-sonnet-5", api_key="k")
+    assert PerplexityAgentProvider(cfg, httpx.MockTransport(handler)).complete("s", [{"role": "user", "content": "q"}]).text == "ok"
+    assert len(bodies) == 1
+    cfg = ProviderConfig(provider="perplexity", model="xai/grok-4.7", api_key="k")  # unknown quirk: learned from the 400
+    assert PerplexityAgentProvider(cfg, httpx.MockTransport(handler)).complete("s", [{"role": "user", "content": "q"}]).text == "ok"

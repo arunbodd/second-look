@@ -235,7 +235,9 @@ class PerplexityAgentProvider:
         if config.api_key:
             headers["Authorization"] = f"Bearer {config.api_key}"
         self._client = httpx.Client(timeout=config.timeout, headers=headers, transport=transport)
-        self._temperature_supported = not config.model.lower().startswith(("openai/gpt-5", "openai/gpt-6"))
+        # Perplexity rejects temperature for reasoning GPT models, and for Claude models together
+        # with max_output_tokens (which Claude requires) with a bare "invalid request".
+        self._temperature_supported = not config.model.lower().startswith(("openai/gpt-5", "openai/gpt-6", "anthropic/"))
         self._max_tokens = config.max_tokens * 3  # reasoning models spend part of the budget thinking
         self._token_param: str | None = "max_output_tokens"
         self._effort = config.reasoning_effort if config.model.lower().startswith(("openai/gpt-5", "openai/gpt-6")) else ""
@@ -264,8 +266,14 @@ class PerplexityAgentProvider:
         if "temperature" in low and "temperature" in body:
             self._temperature_supported = False
             return True
-        if self._token_param and self._token_param in low:
+        if self._token_param and self._token_param in low and "required" not in low:
             self._token_param = None
+            return True
+        if "required" in low and "max_output_tokens" in low and not self._token_param:
+            self._token_param = "max_output_tokens"
+            return True
+        if "temperature" in body:  # a bare "invalid request": the optional parameter is the usual cause
+            self._temperature_supported = False
             return True
         return False
 
