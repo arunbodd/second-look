@@ -94,7 +94,7 @@ Model output is cached by evidence, model pair, and prompt version, so the same 
 
 ### Recorded run
 
-`data/recorded_review.json` holds one real run: GPT-6 Luna writing and Gemini 3.1 Flash-Lite judging, both through Perplexity, for all 50 cases, plus answers to the ten starter questions for the suspicious cases. It cost $0.33. The app shows it when no key is set. A case whose evidence has changed since the recording shows "not run".
+`data/recorded_review.json` holds one real run: GPT-6 Luna writing and Gemini 3.1 Flash-Lite judging, both through Perplexity, for all 50 cases, plus answers to the ten starter questions for the suspicious cases. It cost $0.34. The app shows it when no key is set. A case whose evidence has changed since the recording shows "not run".
 
 Re-record with `python -m app.record` (options: `--writer`, `--judge`, `--max-cost`, default $2).
 
