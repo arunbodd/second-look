@@ -14,8 +14,6 @@ data/server_url.txt
 .DS_Store
 
 # Personal write-up material (kept locally, not part of the code repo)
-WRITEUP.md
-DEMO_SCRIPT.md
 *.pptx
 docs/*.pdf
 docs/build_deck.js
@@ -26,3 +24,6 @@ docs/ui_*.png
 data/recorded_review.partial.json
 data/*.db
 data/triage*.db
+
+*.mov
+*.mp4
