@@ -36,6 +36,21 @@ Tests: `pip install -r requirements-dev.txt && pytest -q`
 | Navigate the queue and drill into a case | The home page lists all 50 cases in a table you can search and filter. Clicking a row opens that case's full details in a panel on the right, and the `j` and `k` keys move to the next or previous case |
 | Interact with a case | Accept or reject the finding with a reason, mark it as needing evidence, agree or disagree with each indicator, add notes, ask follow-up questions, and export a case file |
 
+## The assumptions behind the score
+
+The file doesn't say what normal looks like, so each measured signal has an assumed normal limit and a strongly unusual value, adjusted by care type. They live in `app/engine/signals.py`, and every evidence item in the app says its limit is an assumption.
+
+| Signal | Normal up to | Strongly unusual | Basis |
+|---|---|---|---|
+| Visits per week | 6 (facility care 14) | 14 (28) | Assumption |
+| Distance to provider | 30 mi (facility care: not scored) | 150 mi | Partly: home care averages about 11 miles a visit |
+| Weekend share | 29% (adult day care 10%) | 60% (45%) | Two days in seven; adult day centers open five days a week |
+| Amount vs peer average | +20% | +100% | Assumption |
+| Round-dollar share | 25% | 75% | Assumption |
+| Prior claims, 12 months | 3 (facility care 12) | 10 (24) | Assumption |
+
+Moving every limit 25% tighter or looser changes 4 to 7 of the 50 ratings, all near a rating boundary, and the 8 highest-risk cases stay suspicious either way. In production these limits would be set from historical claims and tuned on confirmed outcomes.
+
 ## How it reasons about a case
 
 Each case goes through three steps, and only the second uses a language model.
