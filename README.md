@@ -84,7 +84,7 @@ The model never sets the score or the rating, so a model error can change the wo
 - **Morning brief.** How many referrals look suspicious, what share of claim dollars they hold, and how much of the money at risk today's picks cover.
 - **Queue.** Cases sorted by risk and dollars at risk, with the evidence behind each score.
 - **Case panel.** The assessment, what points to risk beside what could explain it, the ten signals, the evidence pack, and the decision buttons. Keys: `j`/`k` to move, `a` to accept, `Esc` to close.
-- **Rules review and AI review.** The same queue with template text or model-written text.
+- **AI review and Without AI.** The app opens on the AI review. The Without AI tab shows the engine's own write-up of each case, with the same score, rating, and evidence; it is what the app shows when no AI review is available, for example after you upload a new file without an API key.
 - **Score drivers.** What each signal does to the score in the loaded file, and which signals move together.
 - **Exports.** A Markdown case file per case and an Excel workbook of the queue.
 

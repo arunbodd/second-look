@@ -97,7 +97,7 @@ def build_workbook(svc, mode: str) -> bytes:
     ds = analysis["dataset"]
     s["A1"] = "Second Look · queue summary"
     s["A1"].font = f_title
-    s["A2"] = f"{ds['name']} · {len(rows)} cases · triaged {svc.triaged_at} · review mode: {'AI review' if mode == 'ai' else 'Rules review'} · exported {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+    s["A2"] = f"{ds['name']} · {len(rows)} cases · triaged {svc.triaged_at} · review mode: {'AI review' if mode == 'ai' else 'Without AI'} · exported {datetime.now().strftime('%Y-%m-%d %H:%M')}"
     s["A2"].font = f_muted
     _header(s, 4, ["Risk rating", "Cases", "Claim amount ($)", "Dollars at risk ($)", "Share of claim dollars"])
     for i, lane in enumerate(LANES, start=5):

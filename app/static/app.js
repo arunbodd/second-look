@@ -161,9 +161,9 @@
     const aiReady = m.modes.ai.ready;
     const q = state.page === "queue";
     tabs.append(
-      el("button", { class: q && state.mode === "offline" ? "on" : "", "data-tip": "Engine score, template narrative, rule-based checks. No model calls.", onclick: () => setMode("offline") }, "Rules review"),
       el("button", { class: q && state.mode === "ai" ? "on" : "", "data-tip": m.ai_available ? `Narratives written by ${m.generator}, reviewed by ${m.judge}.` : "Pick a writer in the Models menu, then run the review.", onclick: () => setMode("ai") }, "AI review",
         el("span", { class: "cnt" }, `${aiReady}/${m.cases}`)),
+      el("button", { class: q && state.mode === "offline" ? "on" : "", "data-tip": "The engine's own write-up: the same score, rating, and evidence, with no language model. Used whenever no AI review is available.", onclick: () => setMode("offline") }, "Without AI"),
       el("span", { class: "tab-sep", "aria-hidden": "true" }),
       el("button", { class: q ? "" : "on", "data-tip": "How each column drives the risk score, computed for the loaded file.", onclick: () => setPage("drivers") }, "Score drivers"));
     $("#data-btn").textContent = `${m.dataset.name} · ${m.dataset.rows} ▾`;
@@ -215,7 +215,7 @@
     const price = (e) => e.in == null ? "" : ` · $${e.in} / $${e.out}`;
     const select = (id, role, current) => {
       const s = el("select", { id });
-      s.append(el("option", { value: "offline" }, role === "writer" ? "None (rules review only)" : "None (rule checks only)"));
+      s.append(el("option", { value: "offline" }, role === "writer" ? "None (no AI)" : "None (automated checks only)"));
       if (mm.recorded?.available) s.append(el("option", { value: "recorded", selected: current === "recorded" ? "" : null }, role === "writer" ? `${mm.recorded.label} (no key needed)` : `${mm.recorded.judge} (recorded with the run)`));
       for (const f of fams) {
         const g = el("optgroup", { label: mm.catalog.find((e) => e.family === f).family_label + (mm.keys[f] ? "" : " · no key") });
@@ -294,7 +294,7 @@
     const main = el("div", { class: "r-main" });
     const side = el("div", { class: "r-side" });
     if (!m.ai_available) {
-      main.append(el("div", { class: "r-title" }, el("span", { class: "label" }, "Run AI review"), el("span", { class: "muted" }, "No writer configured. Pick one in the Models menu; the queue and the rules review work without it.")));
+      main.append(el("div", { class: "r-title" }, el("span", { class: "label" }, "Run AI review"), el("span", { class: "muted" }, "No writer configured. Pick one in the Models menu; the queue and the Without AI tab work without it.")));
       side.append(el("button", { class: "btn tall", onclick: () => toggleModels(true) }, "Choose models"));
       bar.append(main, side); return;
     }
@@ -649,7 +649,7 @@
     const n = a.cases, ki = a.key_indicators;
     const maxPts = Math.max(1, ...a.signals.map((x) => x.avg_points_when_fired ?? 0));
     const fams = a.families.slice().sort((x, y) => (y.avg_points_flagged ?? 0) - (x.avg_points_flagged ?? 0));
-    const modeLabel = a.mode === "ai" ? "AI review" : "Rules review";
+    const modeLabel = a.mode === "ai" ? "AI review" : "Without AI";
     const thead = el("thead", {}, el("tr", {},
       el("th", {}, "Signal · flagged when"), el("th", {}, "Flagged in"),
       el("th", { "data-tip": "Average drop in a case's score if this signal alone were normal, over the cases where it was flagged" }, "Points added when flagged"),
@@ -862,13 +862,13 @@
       if (state.meta.replay) {
         why.append(el("div", { class: "sec-head" }, el("span", { class: "label" }, `Why it scored ${c.risk_score}`), eyebrow("Recorded AI review · not run")),
           el("div", { class: "why-note" }, "This case is not in the recorded run, or its evidence changed after the recording. Add an API key to review it with a model."),
-          el("div", {}, el("button", { class: "btn small quiet", onclick: () => setMode("offline") }, "See the rules review")));
+          el("div", {}, el("button", { class: "btn small quiet", onclick: () => setMode("offline") }, "See the version without AI")));
       } else why.append(el("div", { class: "sec-head" }, el("span", { class: "label" }, `Why it scored ${c.risk_score}`), eyebrow(running ? "AI review · writing…" : "AI review · not run")),
         el("div", { class: "why-note" + (running ? " pulse" : "") }, running ? "The writer is drafting the assessment and the judge will review it." : "This case has not been sent to the model yet."),
-        running ? null : el("div", {}, el("button", { class: "btn small", onclick: () => runReview([c.case_id]) }, "Review this case"), " ", el("button", { class: "btn small quiet", onclick: () => setMode("offline") }, "See the rules review")));
+        running ? null : el("div", {}, el("button", { class: "btn small", onclick: () => runReview([c.case_id]) }, "Review this case"), " ", el("button", { class: "btn small quiet", onclick: () => setMode("offline") }, "See the version without AI")));
     } else {
       const n = a.narrative, q = a.quality;
-      const srcLabel = { llm: `${state.meta.replay ? "Recorded AI review" : "AI review"} · ${q.judge_status === "ok" ? `judge ${Math.round(Object.values(q.scores).filter((s) => s != null).reduce((x, y) => x + y, 0) / Math.max(1, Object.values(q.scores).filter((s) => s != null).length))}/5` : "rules " + q.rules.verdict}${a.revisions ? ` · ${a.revisions} revision` : ""}`, template: "Rules review · template", template_fallback: "Rules review · model draft failed review", template_unavailable: "Rules review · model unavailable" }[a.source] || a.source;
+      const srcLabel = { llm: `${state.meta.replay ? "Recorded AI review" : "AI review"} · ${q.judge_status === "ok" ? `judge ${Math.round(Object.values(q.scores).filter((s) => s != null).reduce((x, y) => x + y, 0) / Math.max(1, Object.values(q.scores).filter((s) => s != null).length))}/5` : "rules " + q.rules.verdict}${a.revisions ? ` · ${a.revisions} revision` : ""}`, template: "Without AI · rules text", template_fallback: "Without AI · the model's draft failed review", template_unavailable: "Without AI · model unavailable" }[a.source] || a.source;
       why.append(el("div", { class: "sec-head" }, el("span", { class: "label" }, `Why it scored ${c.risk_score}`), eyebrow(srcLabel, q.verdict !== "pass" ? el("span", { style: "color:var(--accent-text)" }, ` · quality ${VERDICT_LABEL[q.verdict]}`) : null)));
       if (n.summary) why.append(el("p", { class: "summary", html: cites(n.summary) }));
       for (const fl of a.flags) why.append(el("div", { class: "flag " + (fl.level === "error" ? "err" : "") }, fl.text));
@@ -893,6 +893,8 @@
       const neg = conf.reasons.filter((r) => !r.positive).map((r) => r.text);
       if (neg.length) why.append(el("div", { class: "why-note" }, `${conf.level} confidence: ${neg.join("; ").replace(/\.$/, "")}.`));
       why.append(el("div", { class: "next", html: "<b>Next</b> · " + cites(n.recommended_action) }));
+      if (state.mode === "ai") why.append(el("div", { class: "why-note", style: "margin-top:6px;font-size:12px" }, "Compare with the engine's own write-up: ",
+        el("a", { href: "#", "data-tip": "Same score, rating, and evidence, with no language model", onclick: (e) => { e.preventDefault(); setMode("offline"); } }, "see this case without AI")));
     }
     body.append(why);
 
@@ -967,7 +969,7 @@
     const ask = el("div", { class: "ask" + (state.askOpen ? " open" : "") + (msgs.length ? " has-msgs" : "") });
     ask.append(el("div", { class: "a-head" },
       el("div", { class: "a-title" }, el("span", { class: "label" }, "Ask about this case"),
-        el("span", { class: "model-pill", "data-tip": aiMode && state.meta.replay ? "Recorded answers to the starter questions (suspicious cases). Other questions are answered by the rules engine until you add an API key." : aiMode ? "Answers come from the writer model chosen under Models, grounded in this case's evidence pack" : "Rules review answers from the case data with fixed reasoning; switch to AI review for a language model" }, "Answered by ", el("b", {}, answeredBy))),
+        el("span", { class: "model-pill", "data-tip": aiMode && state.meta.replay ? "Recorded answers to the starter questions (suspicious cases). Other questions are answered by the rules engine until you add an API key." : aiMode ? "Answers come from the writer model chosen under Models, grounded in this case's evidence pack" : "Without AI, answers come from the case data with fixed reasoning; switch to AI review for a language model" }, "Answered by ", el("b", {}, answeredBy))),
       el("button", { class: "a-toggle", onclick: () => { state.askOpen = !state.askOpen; renderDrawer(); } }, state.askOpen ? "Collapse ▾" : `Expand ▴${msgs.length ? ` · ${msgs.length / 2 | 0} asked` : ""}`)));
     if (state.askOpen) {
       const qa = el("div", { class: "qa" });

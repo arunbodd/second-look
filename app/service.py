@@ -434,7 +434,7 @@ class TriageService:
             "required_columns": REQUIRED_COLUMNS,
             "ai_available": self.ai_available,
             "replay": self.recorded.summary(self.queue.cases) if (self.replay and self.recorded) else None,
-            "modes": {"offline": {"label": "Rules review", "ready": ready["offline"]},
+            "modes": {"offline": {"label": "Without AI", "ready": ready["offline"]},
                       "ai": {"label": "AI review", "ready": ready["ai"], "available": self.ai_available}},
             "generator": f"{self.recorded.writer['label']} (recorded {self.recorded.recorded_at[:10]})" if self.replay else s.generator.describe(),
             "judge": f"{self.recorded.judge['label']} (recorded)" if self.replay else s.judge.describe(),
