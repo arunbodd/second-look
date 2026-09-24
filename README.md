@@ -33,7 +33,7 @@ Tests: `pip install -r requirements-dev.txt && pytest -q`
 |---|---|
 | Load the 50 cases from the CSV | Loaded and scored at startup from `data/sample_cases_synthetic.csv`; any CSV with the same columns can be uploaded |
 | An AI assessment per case: summary, key signals, risk level, next step | The case panel: a summary, key indicators with evidence citations, a risk score and rating, and a recommended next step |
-| Navigate the queue and drill into a case | The queue table (search, filters, today's picks) opens each case in a side panel; `j`/`k` step through cases |
+| Navigate the queue and drill into a case | The home page lists all 50 cases in a table you can search and filter. Clicking a row opens that case's full details in a panel on the right, and the `j` and `k` keys move to the next or previous case |
 | Interact with a case | Accept or reject the finding with a reason, mark it as needing evidence, agree or disagree with each indicator, add notes, ask follow-up questions, and export a case file |
 
 ## How it reasons about a case
