@@ -1,0 +1,10 @@
+# Runtime dependencies (ranges); requirements.lock pins the exact versions the tests ran against.
+fastapi>=0.110,<1
+uvicorn[standard]>=0.29,<1
+pandas>=2.0,<4
+numpy>=1.26,<3
+scipy>=1.11,<2
+scikit-learn>=1.3,<2
+httpx>=0.27,<1
+pydantic>=2.5,<3
+openpyxl>=3.1,<4

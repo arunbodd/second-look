@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Second Look · AI case review for fraud investigators</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<a class="skip" href="#cases">Skip to the queue</a>
+<header class="top">
+  <div class="brand">Second <em>Look</em></div>
+  <nav class="tabs" id="mode-tabs" aria-label="Views"></nav>
+  <div class="top-right">
+    <input id="csv-file" type="file" accept=".csv,text/csv" hidden>
+    <button id="data-btn" class="btn quiet data-btn" aria-haspopup="dialog" aria-expanded="false">Data ▾</button>
+    <button id="models-btn" class="btn quiet" aria-haspopup="dialog" aria-expanded="false">Models ▾</button>
+    <button id="theme-btn" class="btn quiet theme-btn" title="Switch between the system setting, light, and dark">Theme: auto</button>
+    <label for="actor" class="sr-only">Your name on decisions</label>
+    <input id="actor" class="who" value="A. Investigator" maxlength="40" title="Your name on decisions">
+  </div>
+</header>
+
+<div id="data-menu" class="menu" role="dialog" aria-label="Data" hidden></div>
+<div id="models-menu" class="menu" role="dialog" aria-label="Models" hidden></div>
+
+<main id="queue-page">
+  <section id="runbar" class="runbar" hidden></section>
+  <section id="brief" class="brief" aria-live="polite"></section>
+  <section class="charts" id="charts"></section>
+  <section class="table-wrap">
+    <div class="table-tools" id="filters"></div>
+    <table id="cases"><thead></thead><tbody></tbody></table>
+  </section>
+</main>
+<section id="drivers" class="drivers" hidden></section>
+
+<aside id="drawer" class="drawer" hidden aria-label="Case panel"></aside>
+<div id="scrim" class="scrim" hidden></div>
+<div id="tip" class="tip" hidden></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

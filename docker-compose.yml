@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    ports: ["127.0.0.1:8000:8000"]   # this computer only; the app has no sign-in
+    env_file: [.env]          # API keys and model choices; the file is optional for an offline run
+    volumes: ["jai-data:/data"]
+    restart: unless-stopped
+volumes:
+  jai-data:
